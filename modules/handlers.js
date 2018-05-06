@@ -1,5 +1,7 @@
 var fs = require('fs');
 var formidable = require('formidable');
+var mv = require('mv');
+var path;
 
 exports.upload = function(request, response) {
   console.log("Rozpoczynam obsługę żądania upload.");
@@ -7,7 +9,15 @@ exports.upload = function(request, response) {
   form.uploadDir = "./uploaded-images"; 
   form.keepExtensions = true;
   form.parse(request, function(error, fields, files) {
-    fs.renameSync(files.upload.path, "test.png"); //zmiana nazwy uploadowanego pliku
+
+  	path = "uploaded-images/" + files.upload.name;
+    path = path.toString();
+
+    mv(files.upload.path, path, function(err)
+    {if(err) throw error;
+    console.log('Saved to directory');
+    });
+
     response.writeHead(200, {"Content-Type": "text/html"});
     response.write("received image:<br/>");
     response.write("<img src='/show' />");
